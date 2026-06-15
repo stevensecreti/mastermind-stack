@@ -18,7 +18,5 @@
 		"pull-requests",
 		"house-style",
 		"agnostic"
-	],
-	"skills": "./skills/",
-	"agents": "./agents/"
+	]
 }

@@ -1,7 +1,8 @@
 ---
 name: crystallize
-description: Turn the task you just did into a reusable, project-agnostic skill. Takes a concrete piece of work completed in this session, extracts its abstract recipe (intent, procedure, decision rules, done-condition), strips the incidental specifics (repo paths, file names, values, the particular framework/library/tool), and drafts a clean SKILL.md. Use when you've just done something by hand that you'll plausibly do again and want to "build the lever". Triggers: "make this a skill", "crystallize this", "turn what we just did into a skill", "encode this workflow".
-argument-hint: [optional: what to crystallize and/or the new skill name]
+description: >
+  Turn the task you just did into a reusable, project-agnostic skill. Takes a concrete piece of work completed in this session, extracts its abstract recipe (intent, procedure, decision rules, done-condition), strips the incidental specifics (repo paths, file names, values, the particular framework/library/tool), and drafts a clean SKILL.md. Use when you've just done something by hand that you'll plausibly do again and want to "build the lever". Triggers: "make this a skill", "crystallize this", "turn what we just did into a skill", "encode this workflow".
+argument-hint: "[optional: what to crystallize and/or the new skill name]"
 ---
 
 # Crystallize

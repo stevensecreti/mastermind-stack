@@ -2,7 +2,7 @@
 name: polish-prs
 description: For each PR in a comma-separated list, checkout the branch, run /review-comments to address feedback (commits stay local), fix any CI failures caused by the PR's diff, then push all commits together in one update. Used for finishing PRs that Claude Code routines put up.
 disable-model-invocation: true
-argument-hint: <pr-num>,<pr-num>,... [extra instructions]
+argument-hint: "<pr-num>,<pr-num>,... [extra instructions]"
 allowed-tools: Bash(gh *), Bash(git *), Skill, Read, Write, Edit, Grep, Glob
 ---
 

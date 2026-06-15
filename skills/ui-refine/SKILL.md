@@ -1,11 +1,12 @@
 ---
 name: ui-refine
-description: Refine an existing UI to excellence with an automatic GAN-style loop. Point it at something that already exists (a component file, a page or section, a route/URL, or an attached image of the current design) and it runs a generator/evaluator loop: a generator improves the code each round, an evaluator critiques the live result via Playwright, repeating until the design hits the bar or stops improving. Framework- and design-system-agnostic; all refinement is done in code. Triggers: "refine this", "polish this component/page", "make this UI better", "/ui-refine". To explore several directions first, use ui-explore.
+description: >
+  Refine an existing UI to excellence with an automatic GAN-style loop. Point it at something that already exists (a component file, a page or section, a route/URL, or an attached image of the current design) and it runs a generator/evaluator loop: a generator improves the code each round, an evaluator critiques the live result via Playwright, repeating until the design hits the bar or stops improving. Framework- and design-system-agnostic; all refinement is done in code. Triggers: "refine this", "polish this component/page", "make this UI better", "/ui-refine". To explore several directions first, use ui-explore.
 disable-model-invocation: true
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion, WebSearch, WebFetch
 model: opus
-argument-hint: <component-path | route | section, optionally with an image>
+argument-hint: "<component-path | route | section, optionally with an image>"
 ---
 
 # UI Refine

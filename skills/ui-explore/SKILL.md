@@ -1,11 +1,12 @@
 ---
 name: ui-explore
-description: Explore the design space for a UI when you're not sure which direction to take. Generates 3+ meaningfully different coded variations, each a distinct design philosophy rather than a cosmetic tweak, so you can see the directions side by side and commit to one (or a hybrid). Framework- and design-system-agnostic; all exploration is done in code. Hand the chosen direction to ui-refine to polish it. Triggers: "explore design directions", "show me a few variations", "I'm not sure what direction to take this", "/ui-explore".
+description: >
+  Explore the design space for a UI when you're not sure which direction to take. Generates 3+ meaningfully different coded variations, each a distinct design philosophy rather than a cosmetic tweak, so you can see the directions side by side and commit to one (or a hybrid). Framework- and design-system-agnostic; all exploration is done in code. Hand the chosen direction to ui-refine to polish it. Triggers: "explore design directions", "show me a few variations", "I'm not sure what direction to take this", "/ui-explore".
 disable-model-invocation: true
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion, WebSearch, WebFetch
 model: opus
-argument-hint: <component-path OR "concept description">
+argument-hint: '<component-path OR "concept description">'
 ---
 
 # UI Explore
