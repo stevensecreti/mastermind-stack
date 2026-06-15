@@ -1,0 +1,8 @@
+{
+	"checkCommand": "make check",
+	"testCommand": "make test",
+	"storybook": false,
+	"docsDir": "docs",
+	"coverageMatrix": null,
+	"reviewAutoPost": true
+}

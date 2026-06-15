@@ -1,0 +1,56 @@
+name: release
+
+# Tag-gated release. Push a tag like `v0.1.0` to validate the plugin and cut a
+# GitHub Release. Uses the built-in GITHUB_TOKEN (public repo, no PAT needed).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON manifests
+        run: |
+          set -euo pipefail
+          for f in \
+            .claude-plugin/plugin.json \
+            .claude-plugin/marketplace.json \
+            mastermind.config.example.json; do
+            echo "validating $f"
+            jq empty "$f"
+          done
+
+      - name: Check plugin version matches tag
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          plugin_ver="$(jq -r .version .claude-plugin/plugin.json)"
+          mkt_ver="$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)"
+          echo "tag=$tag  plugin.json=$plugin_ver  marketplace.json=$mkt_ver"
+          [ "$tag" = "$plugin_ver" ] || { echo "::error::plugin.json version ($plugin_ver) != tag ($tag)"; exit 1; }
+          [ "$tag" = "$mkt_ver" ]    || { echo "::error::marketplace.json version ($mkt_ver) != tag ($tag)"; exit 1; }
+
+      - name: Check every skill has a SKILL.md
+        run: |
+          set -euo pipefail
+          fail=0
+          for d in skills/*/; do
+            if [ ! -f "${d}SKILL.md" ]; then
+              echo "::error::missing SKILL.md in ${d}"
+              fail=1
+            fi
+          done
+          exit "$fail"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes

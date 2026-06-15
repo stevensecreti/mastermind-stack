@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# A consuming repo's resolved config should never be committed into the plugin itself
+mastermind.config.json
+
+# Python bytecode (e.g. from compiling the hook)
+__pycache__/
+*.pyc
+
+# Editor / local cruft
+.idea/
+.vscode/
+*.swp

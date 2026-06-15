@@ -1,0 +1,56 @@
+# PR size guard: non-blocking nudge toward splitting large changes before review.
+# Implements the circuit breaker from LARGE_PR_WORKFLOW.md at the CI layer.
+# Drop into .github/workflows/ in each repo. (GitHub Actions; the threshold
+# logic ports to any CI system.)
+name: PR Size Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  size-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Measure diff
+        id: measure
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          FILES=$(git diff --name-only "$BASE" "$HEAD" | wc -l | tr -d ' ')
+          LINES=$(git diff --shortstat "$BASE" "$HEAD" | grep -oE '[0-9]+ insertion|[0-9]+ deletion' | grep -oE '[0-9]+' | paste -sd+ - | bc)
+          LINES=${LINES:-0}
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          echo "lines=$LINES" >> "$GITHUB_OUTPUT"
+
+      # Soft thresholds tuned to the point where reviews turn into 100+ comment
+      # marathons. Warns, does not block.
+      - name: Comment if oversized
+        if: steps.measure.outputs.files > 40 || steps.measure.outputs.lines > 800
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = ${{ steps.measure.outputs.files }};
+            const lines = ${{ steps.measure.outputs.lines }};
+            const body = [
+              '### PR Size Guard',
+              '',
+              `This PR touches **${files} files / ~${lines} changed lines**, past the soft threshold where reviews tend to become unwieldy.`,
+              '',
+              'Per the large-change policy: consider splitting into logically-coupled units, or request a **thematic + pairing review** instead of a full inline pass. See `LARGE_PR_WORKFLOW.md`.',
+              '',
+              '_Non-blocking, informational only._'
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });

@@ -1,0 +1,16 @@
+{
+	"name": "mastermind-stack",
+	"owner": {
+		"name": "Steven Secreti",
+		"url": "https://github.com/stevensecreti"
+	},
+	"description": "Steven Secreti's personal Claude Code marketplace, home of the mastermind-stack plugin.",
+	"plugins": [
+		{
+			"name": "mastermind-stack",
+			"source": "./",
+			"version": "0.1.0",
+			"description": "The skills, agents, and house-style rules I use to get high-quality work out of Claude Code, pulled out of my own projects and made to run anywhere. Deliberately framework-, language-, and library-agnostic."
+		}
+	]
+}

@@ -1,0 +1,44 @@
+// LANGUAGE-SPECIFIC EXAMPLE (JS/TS + ESLint) of the CI-offload principle in ../README.md.
+// The principle is language-agnostic; this is one concrete instance. Adapt the idea
+// to your own stack's linter. Merge the "rules" block into the repo's existing ESLint
+// config. Requires: eslint-plugin-unused-imports, eslint-plugin-react-hooks (for React).
+{
+  "rules": {
+    // --- console: the most-escalated manual comment. Allow only warn/error;
+    //     ban bare console.log outright.
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+
+    // --- unused imports / vars: auto-removable, should never reach review
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "argsIgnorePattern": "^_" }
+    ],
+
+    // --- TODO discipline: forces TODOs to carry a ticket reference or fail
+    "no-warning-comments": [
+      "error",
+      { "terms": ["todo", "fixme", "hack"], "location": "anywhere" }
+    ],
+
+    // --- type safety: offloads the "no any / no unsafe cast" comments
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/consistent-type-assertions": [
+      "error",
+      { "assertionStyle": "never" }
+    ],
+
+    // --- nullish coalescing over || for defaults
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
+
+    // --- rules of hooks (React): offloads the hard-blocking hooks-in-JSX comments
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+
+    // --- keys (React): offloads the recurring key={index} comments
+    "react/no-array-index-key": "warn"
+
+    // Commented-out code is best caught by a dead-export tool + a pre-commit
+    // formatter; ESLint's no-commented-out-code plugins are noisy.
+  }
+}

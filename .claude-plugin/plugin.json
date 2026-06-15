@@ -1,0 +1,24 @@
+{
+	"name": "mastermind-stack",
+	"version": "0.1.0",
+	"description": "The skills, agents, and house-style rules I use to get high-quality work out of Claude Code, pulled out of my own projects and made to run anywhere. Deliberately framework-, language-, and library-agnostic.",
+	"author": {
+		"name": "Steven Secreti",
+		"url": "https://github.com/stevensecreti"
+	},
+	"homepage": "https://github.com/stevensecreti/mastermind-stack",
+	"repository": "https://github.com/stevensecreti/mastermind-stack",
+	"license": "MIT",
+	"keywords": [
+		"claude-code",
+		"skills",
+		"agents",
+		"code-review",
+		"refactoring",
+		"pull-requests",
+		"house-style",
+		"agnostic"
+	],
+	"skills": "./skills/",
+	"agents": "./agents/"
+}
