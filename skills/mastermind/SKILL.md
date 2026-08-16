@@ -54,6 +54,14 @@ Both auto-detect the surface (GitHub PR via `gh` if a ref is given and authentic
 | Turn the task we just did into a reusable, project-agnostic skill (abstract the recipe, strip incidentals) | `crystallize` | skill |
 | Configure this plugin in a new repo | `mastermind-setup` | skill |
 
+## Output styles
+
+| You want to… | Entry point | Kind |
+|---|---|---|
+| Responses in meaning-first prose: short SVO sentences, plain words, chained ideas, assertions over hedges | `Throughline` | output style |
+
+Output styles aren't invoked like skills. The user activates one via `/config` → **Output style** (or `"outputStyle": "Throughline"` in settings); it then governs every response. If the user asks for terser, meaning-first responses, point them there.
+
 ## House-style rules (always-on once installed)
 
 These are always-on guidance, loaded into every session once `mastermind-setup` installs them:

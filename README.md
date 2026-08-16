@@ -93,6 +93,26 @@ The piece I'm most attached to. `code-review-dna` reviews in my own rubric and v
 | `axis-architecture`, `axis-implementation`, `axis-types-naming`, `axis-hygiene`, `axis-coverage` | The five review axes, each scoped to one rubric tier (or the coverage doc). Dispatched in parallel by `deep-review`.                                                                                                             |
 
 
+### Output styles (1)
+
+
+| Style         | Does                                                                                                                                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Throughline` | Meaning-first prose: short subject-verb-object sentences, plain words, each idea chained to the next, assertions over hedges, every word earning its keep. Coding behavior is untouched; only the writing changes. |
+
+
+**Using it in Claude Code**
+
+1. Install the plugin (see [Install](#install)). The style ships in `output-styles/` and Claude Code discovers it automatically; no extra setup, and `mastermind-setup` is not involved.
+2. Run `/config`, select **Output style**, and pick **Throughline**. Plugin styles appear unnamespaced in the picker, merged with the built-ins. (The old `/output-style` command was removed in v2.1.91; `/config` is the current path.)
+3. To pin it instead of picking it per session, set `"outputStyle": "Throughline"` in `.claude/settings.json` for one project or `~/.claude/settings.json` for everywhere.
+
+The style sets `keep-coding-instructions: true`, so Claude Code keeps its built-in software-engineering instructions and Throughline only governs how responses read.
+
+**Adapting it to other harnesses or LLMs**
+
+The style is a harness-agnostic writing spec, so it travels the same way the rules do. Take the body of [`output-styles/throughline.md`](output-styles/throughline.md) (everything below the YAML frontmatter) and put it wherever your tool accepts standing instructions: the system prompt of a raw API call, custom instructions in a chat UI, or the rules file of another coding agent (`AGENTS.md`, `.cursorrules`, and the like). Drop the frontmatter; it's Claude Code plumbing. `keep-coding-instructions: true` only tells Claude Code not to swap out its default engineering prompt, which no other harness does anyway, and `name`/`description` just feed the picker.
+
 ### House-style rules (4)
 
 These aren't invoked. They're the standards I hold, loaded into every session once `mastermind-setup` installs them (Claude Code doesn't auto-load a plugin's `rules/`, so setup copies them into your repo or imports them from your `CLAUDE.md`).
