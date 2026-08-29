@@ -1,16 +1,17 @@
 ---
 name: polish-prs
-description: For each PR in a comma-separated list, checkout the branch, run /review-comments to address feedback (commits stay local), fix any CI failures caused by the PR's diff, then push all commits together in one update. Used for finishing PRs that Claude Code routines put up.
-disable-model-invocation: true
-argument-hint: "<pr-num>,<pr-num>,... [extra instructions]"
+description: For each PR in a comma-separated list, check out the branch, run review-comments to address feedback while keeping commits local, fix CI failures caused by the diff, then push all commits together. Use to finish a batch of coding-agent PRs.
 allowed-tools: Bash(gh *), Bash(git *), Skill, Read, Write, Edit, Grep, Glob
 ---
 
 ## Inputs
 
-`$ARGUMENTS`: comma-separated PR numbers (e.g. `1405,1406,1407`), optionally followed by extra instructions to forward to `/review-comments`.
+Accept a comma-separated list of PR numbers (for example, `1405,1406,1407`),
+optionally followed by extra instructions for the `review-comments` skill.
 
-Parse the leading comma-separated integer list as the PR set. Trim whitespace around each number. Anything after the last PR number is forwarded as extra args to `/review-comments`.
+Parse the leading comma-separated integer list as the PR set. Trim whitespace around
+each number. Forward anything after the last PR number as extra instructions to
+`review-comments`.
 
 ## Task
 
@@ -30,14 +31,16 @@ If dirty, stop and ask the user. Do not blow away uncommitted work. Otherwise:
 gh pr checkout <pr-num>
 ```
 
-### 2. Run `/review-comments` with deferred push
+### 2. Run `review-comments` with deferred push
 
-Invoke the `review-comments` skill via the Skill tool, passing args that tell it to commit locally only, skip the push, and skip the "Addressed in <sha>" replies. The polish skill will push and post those replies itself once CI fixes are also in.
+Invoke the `review-comments` skill through the host's skill mechanism. Tell it to
+commit locally only, skip the push, and skip the "Addressed in <sha>" replies. This
+skill will push and post those replies once CI fixes are also in.
 
 Pass args like:
 
 ```
-don't push yet. I'll push after CI fixes are bundled in. Skip the "Addressed in <sha>" replies and instead report back the list of thread top-level comment databaseIds you would have replied to (one per fixed thread), so I can post the replies after the combined push lands with the final SHA. Disagreement pushback replies should still be posted now. <forward any extra args from $ARGUMENTS>
+don't push yet. I'll push after CI fixes are bundled in. Skip the "Addressed in <sha>" replies and instead report back the list of thread top-level comment databaseIds you would have replied to (one per fixed thread), so I can post the replies after the combined push lands with the final SHA. Disagreement pushback replies should still be posted now. <forward any extra user instructions>
 ```
 
 Capture from the review-comments output:

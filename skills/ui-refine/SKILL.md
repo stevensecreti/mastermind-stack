@@ -2,38 +2,31 @@
 name: ui-refine
 description: >
   Refine an existing UI to excellence with an automatic GAN-style loop. Point it at something that already exists (a component file, a page or section, a route/URL, or an attached image of the current design) and it runs a generator/evaluator loop: a generator improves the code each round, an evaluator critiques the live result via Playwright, repeating until the design hits the bar or stops improving. Framework- and design-system-agnostic; all refinement is done in code. Triggers: "refine this", "polish this component/page", "make this UI better", "/ui-refine". To explore several directions first, use ui-explore.
-disable-model-invocation: true
-user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion, WebSearch, WebFetch
-model: opus
-argument-hint: "<component-path | route | section, optionally with an image>"
 ---
 
 # UI Refine
 
 Point this at a UI that already exists and it polishes it to excellence through a GAN-inspired loop: a generator implements improvements, an evaluator critiques the live result via Playwright, round after round, until scores hit the bar or stop moving. If you don't yet know which direction to take the design, start with `ui-explore` and bring the chosen variation here.
 
-You are the **Design Lead**. You orchestrate the loop with **Agent Teams teammates** and operate in **delegate mode**: you never write or evaluate the design yourself, you run the loop between two teammates. All refinement is done in code.
+You are the **Design Lead**. Use two persistent collaborators when the host supports them: a generator that edits the implementation and an evaluator that inspects the live result. Keep these roles separate across iterations. If persistent collaborators are unavailable, run the same generator/evaluator phases sequentially with an explicit context handoff.
 
-This skill is framework- and library-agnostic. Detect the project's actual stack and instruct teammates in those terms; never assume React, Chakra, Storybook, or any specific tool. Project specifics come from `mastermind.config.json` (`checkCommand`, `storybook`) with sane fallbacks.
+This skill is framework- and library-agnostic. Detect the project's actual stack and brief workers in those terms; never assume React, Chakra, Storybook, or any specific tool. Project specifics come from `mastermind.config.json` (`checkCommand`, `storybook`) with sane fallbacks.
 
 ## Hard rules
 
 These are non-negotiable. Violating any is a skill failure.
 
-1. **Never write, edit, or create component code yourself.** You spawn teammates who do the work. Your own tool use is limited to reading files, grep/glob discovery, bash for type/lint checks or the dev server, web research, and spawning/messaging teammates.
-2. **Never evaluate design quality yourself.** The evaluator teammate does that via Playwright.
-3. **Never use `Agent()` subagents.** Use Agent Teams teammates exclusively.
+1. **Keep generator and evaluator responsibilities separate.** The evaluator never edits; the generator never scores its own work.
+2. **When persistent collaborators are available, the lead does not implement or evaluate.** The lead gathers context, relays complete feedback, applies stop conditions, and integrates results.
+3. **Use the host's native collaboration mechanism.** Do not hardcode one provider's tool or model names.
 4. **Never ask the user whether to continue iterating.** The loop runs autonomously and stops only when the early-stop conditions are met.
-5. **Never skip the evaluator.** Every iteration gets a full Playwright-based evaluation.
-6. **Use delegate mode** (Shift+Tab) after spawning. If it's unavailable, self-enforce rules 1-2 strictly.
-7. **All teammates use Opus.**
+5. **Never skip the evaluator.** Every iteration gets a live browser-based evaluation.
 
 ## Prerequisites
 
-1. Verify `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set. If it's unavailable, fall back to solo mode (see Error Recovery).
-2. Verify Playwright MCP is configured: `grep -r "playwright" .mcp.json ~/.claude.json 2>/dev/null`. If it's missing, tell the user to install Playwright MCP and halt.
-3. Verify a dev server (or component workshop such as Storybook, if the project uses one) is running or can be started. Note the URL.
+1. Verify a browser-automation mechanism is available. Prefer Playwright; the host's browser or Chrome tooling is acceptable when it supports navigation, interaction, viewport changes, and screenshots. If none is available, report the missing prerequisite and stop.
+2. Verify a dev server or component workshop is running or can be started. Note the URL.
 
 ## Step 1: Identify the target
 
@@ -51,7 +44,7 @@ If you're given only an image with no code, ask which file or route renders it b
 1. Read the target. Trace its imports, props/inputs, consumers.
 2. Determine its type: **canvas**, **standard** (DOM/component-tree), or **hybrid**.
 3. Determine whether animations are present.
-4. Read `${CLAUDE_PLUGIN_ROOT}/skills/ui-explore/references/GRADING_CRITERIA.md` and note which diagnostic sections apply.
+4. Read `../ui-explore/references/GRADING_CRITERIA.md` and note which diagnostic sections apply.
 5. Note the project's design-system guidance, if any.
 6. Check accumulated design preferences (see Design Preferences below) for patterns.
 7. Confirm the dev-server / preview URL where the target is visible.
@@ -60,7 +53,7 @@ Produce a **component brief**: file path, purpose, type, whether animated, previ
 
 ## Step 3: Refinement loop (GAN)
 
-Spawn a new Agent Teams team with exactly 2 Opus teammates: `refine-generator` and `refine-evaluator`. Do not proceed until both are confirmed spawned.
+Create exactly two persistent collaborators when supported: `refine-generator` and `refine-evaluator`. Do not proceed until both are ready. In sequential fallback, preserve two separate phase briefs and never let the evaluator edit code.
 
 ### `refine-generator` spawn prompt
 
@@ -138,10 +131,10 @@ Message the lead: "Iteration {N} complete. Changes: {what you changed, mapped to
 ### `refine-evaluator` spawn prompt
 
 ```
-You are a senior designer critiquing a UI implementation. You evaluate by navigating the live page with Playwright MCP tools, observing what's actually there, and producing diagnostic feedback the generator can act on. You are direct, specific, and quantitative.
+You are a senior designer critiquing a UI implementation. Navigate and interact with the live page using the available browser-automation tools, observe what is actually rendered, and produce diagnostic feedback the generator can act on. Be direct, specific, and quantitative.
 
 ## Evaluation Methodology
-{paste full content of ${CLAUDE_PLUGIN_ROOT}/skills/ui-explore/references/GRADING_CRITERIA.md}
+{paste the full content of ../ui-explore/references/GRADING_CRITERIA.md}
 
 ## Dev Server
 Navigate to: {preview URL}
@@ -149,13 +142,13 @@ Component location: {component path description}
 
 ## MANDATORY Evaluation Process
 
-1. Navigate to the component using Playwright browser_navigate.
+1. Navigate to the component with the available browser tool.
 2. Take screenshots at key states: default, hover, active, error, empty, loading.
 3. Interact with the UI: click buttons, fill forms, drag elements, resize viewport.
 4. For canvas components: test zoom/pan, selection, drag operations, cursor changes.
 5. For animated components: observe timing, staging, easing/spring behavior, stagger rhythm.
 
-{If the project uses Storybook (config `storybook`): when only static a11y on the rendered story state matters (no interaction sequence to script), call the Storybook MCP server's `run-story-tests` against the specific stories instead of running a full Playwright pass. Use this as a focused substitute, not a replacement for interaction testing.}
+{If the project uses Storybook: when only static accessibility on a rendered state matters, use any available focused story test against the specific stories. This is a focused substitute, not a replacement for interaction testing.}
 
 ## MANDATORY Output Format
 
@@ -236,7 +229,7 @@ END FOR
 
 ## Step 4: Finalize
 
-1. Shut down the refinement team.
+1. Close persistent collaborators when the host requires explicit cleanup.
 2. Collect all evaluations across iterations.
 3. Report to the user:
     - Score trajectory table across iterations
@@ -251,7 +244,7 @@ END FOR
 
 Accumulated design taste is per-project, not global to this plugin; never write into the plugin directory. On first use in a repo:
 
-1. If `.claude/mastermind/design-preferences.md` does NOT exist, create it by copying the template at `${CLAUDE_PLUGIN_ROOT}/skills/ui-explore/references/DESIGN_PREFERENCES.template.md`.
+1. If `.mastermind/design-preferences.md` does not exist, create it from `../ui-explore/references/DESIGN_PREFERENCES.template.md`.
 2. Read it during Step 2 and write accumulated decisions to it during Step 4.
 
 This keeps each project's brand identity, component preferences, and decision log with that project, while the plugin stays generic.
@@ -260,13 +253,13 @@ This keeps each project's brand identity, component preferences, and decision lo
 
 | Scenario | Action |
 |---|---|
-| Agent Teams unavailable | **Solo mode.** Implement improvements yourself using the design principles, and use Playwright yourself for evaluation. This is the only scenario where you touch the code directly. |
-| Playwright MCP missing | Tell the user to install Playwright MCP and halt. |
+| Persistent collaborators unavailable | Run generator and evaluator phases sequentially, using complete written handoffs between phases. |
+| Browser automation missing | Report the missing prerequisite and stop; rendered evaluation is required. |
 | Dev server won't start | Debug the build. Fall back to a component workshop (if any) or a static preview page. |
-| Teammate crashes | Spawn a replacement with the same prompt. Include context from prior iterations. |
+| Worker crashes | Restart that role with the same prompt and context from prior iterations. |
 | Generator doesn't address Top Opportunities | Re-message: "Your changes did not address the evaluator's top priorities. Specifically address: {list top 3}. Do not implement other changes until these are resolved." |
 | Evaluator skips diagnostic steps | Re-message: "Your evaluation skipped required steps. Re-evaluate following the mandatory sequence." |
 | Evaluator too lenient | Re-message: "Your scores don't match findings. You identified {N} issues but scored {X}/10. Recalibrate: unmodified defaults = 5 max. Re-score from your own findings." |
 | Generator regresses scores | In the feedback relay: "Scores regressed. Revert the last changes and try a different approach." |
 | All scores start >= 8 | Run 1 evaluator pass to confirm, then early-stop. |
-| Lead catches itself about to implement | STOP. Message the generator teammate instead. |
+| Lead catches itself implementing while collaborators are active | Stop and message the generator instead. |

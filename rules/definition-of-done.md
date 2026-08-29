@@ -1,8 +1,8 @@
 # Definition of Done
 
-These checks apply to EVERY code change, regardless of how it's implemented (solo, agent teams, or manual).
+These checks apply to every code change, regardless of how it is implemented.
 
-> **Configuration:** This rule reads project specifics from `mastermind.config.json` (run the `mastermind-setup` skill to create it). Every key is optional. Where a key is unset, fall back to what the consuming repo's `CLAUDE.md` documents, then to sane defaults. The relevant keys are called out inline below.
+> **Configuration:** This rule reads project specifics from `mastermind.config.json` (run the `mastermind-setup` skill to create it). Every key is optional. Where a key is unset, fall back to the consuming repository's governing instructions (`AGENTS.md`, `CLAUDE.md`, or equivalent), then to sane defaults.
 
 ## Universal Requirements
 
@@ -23,7 +23,7 @@ These checks apply to EVERY code change, regardless of how it's implemented (sol
 - Create new docs if the change introduces new concepts, features, APIs, or architectural patterns
 - Check the docs root for any references to changed functionality
 
-**Validation**: The project's **check** and **test** commands must pass before any work is considered complete. These are `checkCommand` and `testCommand` in `mastermind.config.json` (e.g. `make check` / `make test`, `npm run lint` / `npm test`, `pnpm check` / `pnpm test`). If unset, use whatever the consuming repo's `CLAUDE.md` documents as its lint/typecheck and test entry points.
+**Validation**: The project's **check** and **test** commands must pass before any work is considered complete. These are `checkCommand` and `testCommand` in `mastermind.config.json` (e.g. `make check` / `make test`, `npm run lint` / `npm test`, `pnpm check` / `pnpm test`). If unset, use the lint, typecheck, and test entry points documented in the repository's governing instructions.
 
 **Architectural Quality**: The implementation must be the architecturally correct solution, not merely a working one. If a simpler or more maintainable approach exists using established codebase patterns, that approach must be used. Adding special-case logic, workarounds, or conditional branches to avoid proper restructuring is a DoD failure.
 

@@ -1,8 +1,8 @@
 # mastermind-stack
 
-> The skills, agents, and house-style rules I use to get high-quality work out of Claude Code, pulled out of my own projects and made to run anywhere.
+> The skills, review workers, and house-style rules I use to get high-quality work out of Codex and Claude Code, pulled out of my own projects and made to run anywhere.
 
-Coding agents are only as good as the engineer driving them. I've spent years building up a way of working: the standards I hold myself to, the patterns I reach for, the voice I review in. The more I leaned on Claude Code, the more I noticed I was re-teaching it the same things in every repo, so I pulled all of that accumulated craft out into one portable place. This is that.
+Coding agents are only as good as the engineer driving them. I've spent years building up a way of working: the standards I hold myself to, the patterns I reach for, the voice I review in. The more I leaned on coding agents, the more I noticed I was re-teaching them the same things in every repo, so I pulled all of that accumulated craft out into one portable place. This is that.
 
 I think the most valuable thing you can hand an agent is taste: a clear bar for what good looks like, and the discipline to subtract before you add. So the tools here lean on that. They reach for deletion before addition, they hold a real definition of done, and they review against standards I actually believe in rather than generic best-practice filler.
 
@@ -12,25 +12,42 @@ And the whole thing is self-describing. A router skill maps whatever you're tryi
 
 ## Install
 
-```sh
-# add this repo as a plugin marketplace
-claude plugin marketplace add stevensecreti/mastermind-stack
+### Codex
 
-# install the plugin
+Add the repository marketplace and install the plugin:
+
+```sh
+codex plugin marketplace add stevensecreti/mastermind-stack
+codex plugin add mastermind-stack@mastermind-stack
+```
+
+The repository also ships a native `.codex-plugin/plugin.json` manifest, so it can
+be imported from GitHub in the Codex workspace marketplace. Once the plugin is
+listed in the public Codex directory, the same package can be installed with the
+directory's Install button.
+
+Start a new task in the target repository and invoke `$mastermind-setup` once so
+the plugin can detect the project's commands and install its standing rules into
+`AGENTS.md`.
+
+### Claude Code
+
+```sh
+claude plugin marketplace add stevensecreti/mastermind-stack
 claude plugin install mastermind-stack@mastermind-stack
 ```
 
-Then, once per repo, run the setup skill so the plugin knows your project's specifics and the house-style rules take effect:
-
-```
-/mastermind-setup
-```
+Then run `/mastermind-setup` once per repository. Claude Code installs the standing
+rules under `.claude/rules/` and wires them into `CLAUDE.md`.
 
 ## What's inside
 
 Each tool does one job. If you're not sure which one you want, the `mastermind` router will point you at it.
 
-### Skills (14)
+### Skills (22)
+
+Six review-worker skills are internal building blocks used by the two review
+orchestrators. The other 16 can be invoked directly in either host.
 
 **UI design & analysis**
 
@@ -38,16 +55,17 @@ Each tool does one job. If you're not sure which one you want, the `mastermind` 
 | Skill          | Does                                                                                                                                                                                   |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ui-breakdown` | Decompose a UI image into a framework-agnostic 5-tier component hierarchy + composition plan                                                                                           |
-| `ui-explore`   | Explore the design space when you're not sure of the direction: generate several directionally different coded variations (Agent Teams) and pick one, or a hybrid.                     |
-| `ui-refine`    | Refine an existing UI to excellence: point it at a component, page, section, or a chosen variation, and it runs an autonomous GAN generator/evaluator loop (Agent Teams + Playwright). |
+| `ui-explore`   | Explore the design space with several directionally different coded variations, using parallel workers when the host supports them, then pick one or a hybrid.                         |
+| `ui-refine`    | Refine an existing UI with a generator/evaluator loop and real browser evidence when browser automation is available.                                                                   |
 
 
 **Code quality**
 
 
-| Skill        | Does                                                                                                                                                                                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `naturalize` | Make AI/agent-written code read like a careful human wrote it *in this codebase*: strip the AI tells (over-comments, ceremonial guards, `any` escape hatches), conform to local idiom, naming, and density. Behavior-preserving; hands structural changes to `refactor`. |
+| Skill        | Does                                                                                                                                                                                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `naturalize` | Make agent-written code read like a careful human wrote it in this codebase: remove AI tells and conform to local idiom, naming, and density.                                                                                                                        |
+| `refactor`   | Improve code without changing behavior through subtractive simplification or constructive restructuring.                                                                                                                                                           |
 
 
 **Code review**
@@ -57,8 +75,11 @@ The piece I'm most attached to. `code-review-dna` reviews in my own rubric and v
 
 | Skill             | Does                                                                                                                                                           |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `code-review-dna` | Fast single-pass review of a PR or local diff, in my rubric and review voice. Dispatches the `dna-reviewer` agent.                                             |
-| `deep-review`     | Thorough multi-axis review: five parallel axis agents (architecture, implementation, types/naming, hygiene, tests/docs/observability), merged into one review. |
+| `code-review-dna` | Fast single-pass review of a PR or local diff in my rubric and review voice. Uses the `dna-reviewer` worker skill.                                              |
+| `deep-review`     | Thorough multi-axis review across architecture, implementation, types/naming, hygiene, and tests/docs/observability, merged into one review.                   |
+
+Internal review workers: `dna-reviewer`, `axis-architecture`,
+`axis-implementation`, `axis-types-naming`, `axis-hygiene`, and `axis-coverage`.
 
 
 **Pull requests & git flow**
@@ -83,14 +104,19 @@ The piece I'm most attached to. `code-review-dna` reviews in my own rubric and v
 | `mastermind-setup` | One-time per-repo configuration (see below)                                                                                       |
 
 
-### Agents (7)
+**Writing**
 
 
-| Agent                                                                                            | Does                                                                                                                                                                                                                             |
-| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `refactor`                                                                                       | Improve code without changing behavior: **subtractive** (cut complexity, kill duplication, remove premature abstraction) and **constructive** (SOLID, design patterns, extract/restructure), scoped to a diff or a codebase area |
-| `dna-reviewer`                                                                                   | Single-pass review analyzer: reads the rubric + voice, returns structured findings. Dispatched by `code-review-dna`.                                                                                                             |
-| `axis-architecture`, `axis-implementation`, `axis-types-naming`, `axis-hygiene`, `axis-coverage` | The five review axes, each scoped to one rubric tier (or the coverage doc). Dispatched in parallel by `deep-review`.                                                                                                             |
+| Skill         | Does                                                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `throughline` | Apply the Throughline meaning-first prose style to the current task.                                                                    |
+
+
+### Claude Code agent adapters (7)
+
+Claude Code can still dispatch the original seven agent definitions. Each is now
+a thin adapter over the corresponding canonical skill, which prevents the Codex
+and Claude implementations from drifting.
 
 
 ### Output styles (1)
@@ -109,20 +135,25 @@ The piece I'm most attached to. `code-review-dna` reviews in my own rubric and v
 
 The style sets `keep-coding-instructions: true`, so Claude Code keeps its built-in software-engineering instructions and Throughline only governs how responses read.
 
-**Adapting it to other harnesses or LLMs**
+**Using it in Codex or another harness**
 
-The style is a harness-agnostic writing spec, so it travels the same way the rules do. Take the body of [`output-styles/throughline.md`](output-styles/throughline.md) (everything below the YAML frontmatter) and put it wherever your tool accepts standing instructions: the system prompt of a raw API call, custom instructions in a chat UI, or the rules file of another coding agent (`AGENTS.md`, `.cursorrules`, and the like). Drop the frontmatter; it's Claude Code plumbing. `keep-coding-instructions: true` only tells Claude Code not to swap out its default engineering prompt, which no other harness does anyway, and `name`/`description` just feed the picker.
+Invoke `$throughline` in Codex. The canonical skill contains the same writing spec
+as the Claude output style. You can also put the body of
+[`output-styles/throughline.md`](output-styles/throughline.md) wherever another
+tool accepts standing instructions.
 
 ### House-style rules (4)
 
-These aren't invoked. They're the standards I hold, loaded into every session once `mastermind-setup` installs them (Claude Code doesn't auto-load a plugin's `rules/`, so setup copies them into your repo or imports them from your `CLAUDE.md`).
+These aren't invoked. They're the standards I hold, loaded into every session once
+`mastermind-setup` installs them. Codex gets a managed block in the repository's
+`AGENTS.md`; Claude Code gets `.claude/rules/` imports from `CLAUDE.md`.
 
 
 | Rule                      | Does                                                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `architecture-principles` | Contract-first, modularity, converge-on-final-state, idempotency, reuse-first, exhaust-the-design-space, build-the-lever, fix-adjacent-problems                |
 | `definition-of-done`      | Testing, validation, docs, stories, architectural quality: the bar every change clears                                                                         |
-| `agent-teams-guidance`    | When to use a single session vs subagents vs agent teams; lead/worker roles; task decomposition; model routing                                                 |
+| `agent-teams-guidance`    | When to use one session versus parallel workers; lead/worker roles, task decomposition, and safe shared-workspace coordination                                |
 | `critical-rules`          | The non-negotiables every session follows: autonomy default, reuse-first, the definition of done, fix-what-you-find, plus a canary (see [Canaries](#canaries)) |
 
 
@@ -142,7 +173,10 @@ Use whatever word you like ("Mastermind" fits the stack; your own name works jus
 
 ## Configuration
 
-Most of the tools work with zero setup. The few that touch your project (the code reviewer, the definition-of-done rule) need to know a couple of things, like how you run checks and tests. Run `/mastermind-setup` once per repo and it detects all of that and writes a `mastermind.config.json` for you. You can also write it by hand:
+Most tools work with zero setup. The few that touch your project need to know how
+you run checks and tests. Run `$mastermind-setup` in Codex or
+`/mastermind-setup` in Claude Code once per repository; it detects those details
+and writes `mastermind.config.json`. You can also write it by hand:
 
 ```json
 {
@@ -155,7 +189,9 @@ Most of the tools work with zero setup. The few that touch your project (the cod
 }
 ```
 
-The surface is deliberately small, and it grows only as a new skill genuinely needs a key. Anything it doesn't know falls back to whatever your `CLAUDE.md` documents, then to sensible defaults.
+The surface is deliberately small, and it grows only as a new skill genuinely
+needs a key. Anything it doesn't know falls back to the repository's `AGENTS.md`,
+`CLAUDE.md`, or equivalent instructions, then to sensible defaults.
 
 ## What's here, and what isn't
 

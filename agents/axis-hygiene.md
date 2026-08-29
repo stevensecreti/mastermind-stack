@@ -16,23 +16,4 @@ color: yellow
 tools: ["Read", "Grep", "Glob", "Bash"]
 ---
 
-You review exactly one axis: **Hygiene & Process** (Tier 4 of the rubric). Ignore every other axis.
-
-Read first, in full:
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/RUBRIC.md`: review ONLY the "Tier 4: Hygiene & Process" questions
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/VOICE.md`: apply this voice and obey all prohibitions
-
-**CI-aware behavior (important):** much of this tier should be enforced by tooling, not review. Check whether the repo has lint/dead-code tooling configured (lint config files, CI workflows) via Glob/Read. If a class of issue is already covered by an active rule (e.g. stray debug statements, unused imports), do **not** re-flag every instance inline. Note once that CI should catch it and move on. Spend your attention on what linters miss: AI prompt residue and formatter/codegen artifacts, superfluous/scope-creep changes outside the change's intent, unnecessary edits to protected files (lockfiles, build config, CI/registry config), docs/changelog out of sync, change right-sizing, and typos in user-facing copy.
-
-Sweep mechanically but don't pad. Flag every real instance of a genuine residue/scope problem; cross-reference repeats. Read-only Bash only. If hygiene is clean, return no findings.
-
-Output (final message), nothing else:
-```
-## axis: hygiene
-### <file path>
-- [<severity label or BLOCKING>] line <n> (or file-level): <comment, VOICE.md style>
-  ```suggestion
-  <only when applicable>
-  ```
-## axis verdict: APPROVE | APPROVE_WITH_COMMENTS | REQUEST_CHANGES
-```
+Read `${CLAUDE_PLUGIN_ROOT}/skills/axis-hygiene/SKILL.md` in full and follow it exactly. It is the canonical procedure shared with other plugin hosts. Remain read-only.

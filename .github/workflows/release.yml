@@ -21,6 +21,8 @@ jobs:
         run: |
           set -euo pipefail
           for f in \
+            .codex-plugin/plugin.json \
+            .agents/plugins/marketplace.json \
             .claude-plugin/plugin.json \
             .claude-plugin/marketplace.json \
             mastermind.config.example.json; do
@@ -32,11 +34,28 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME#v}"
-          plugin_ver="$(jq -r .version .claude-plugin/plugin.json)"
+          codex_ver="$(jq -r .version .codex-plugin/plugin.json)"
+          claude_ver="$(jq -r .version .claude-plugin/plugin.json)"
           mkt_ver="$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)"
-          echo "tag=$tag  plugin.json=$plugin_ver  marketplace.json=$mkt_ver"
-          [ "$tag" = "$plugin_ver" ] || { echo "::error::plugin.json version ($plugin_ver) != tag ($tag)"; exit 1; }
+          echo "tag=$tag  codex=$codex_ver  claude=$claude_ver  marketplace=$mkt_ver"
+          [ "$tag" = "$codex_ver" ]  || { echo "::error::Codex plugin version ($codex_ver) != tag ($tag)"; exit 1; }
+          [ "$tag" = "$claude_ver" ] || { echo "::error::Claude plugin version ($claude_ver) != tag ($tag)"; exit 1; }
           [ "$tag" = "$mkt_ver" ]    || { echo "::error::marketplace.json version ($mkt_ver) != tag ($tag)"; exit 1; }
+
+      - name: Validate Codex marketplace contract
+        run: |
+          set -euo pipefail
+          jq -e '
+            .name == "mastermind-stack" and
+            .skills == "./skills/" and
+            .interface.displayName == "Mastermind Stack"
+          ' .codex-plugin/plugin.json >/dev/null
+          jq -e '
+            .plugins[0].name == "mastermind-stack" and
+            .plugins[0].source.source == "url" and
+            .plugins[0].source.url == "https://github.com/stevensecreti/mastermind-stack.git" and
+            .plugins[0].policy.installation == "AVAILABLE"
+          ' .agents/plugins/marketplace.json >/dev/null
 
       - name: Check every skill has a SKILL.md
         run: |
@@ -49,6 +68,18 @@ jobs:
             fi
           done
           exit "$fail"
+
+      - name: Check cross-host skill compatibility
+        run: |
+          set -euo pipefail
+          if grep -R -n -E '^(disable-model-invocation|argument-hint|user-invocable|version):' skills; then
+            echo "::error::Shared skill frontmatter contains a non-portable key"
+            exit 1
+          fi
+          if grep -R -n 'CLAUDE_PLUGIN_ROOT' skills rules recommendations; then
+            echo "::error::Shared plugin content contains a Claude-only root path"
+            exit 1
+          fi
 
       - name: Create GitHub Release
         env:

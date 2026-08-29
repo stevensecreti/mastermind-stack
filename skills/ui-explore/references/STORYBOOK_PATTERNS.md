@@ -32,7 +32,7 @@ When Storybook dev is running, the official `@storybook/addon-mcp` exposes an MC
 | Discover whether a component already exists | `list-all-documentation` |
 | Study a candidate component before reusing | `get-documentation`, `get-documentation-for-story` |
 | Write a new story | `get-storybook-story-instructions` first, then author the file directly |
-| Share rendered context with a teammate | `preview-stories` |
+| Share rendered context with a worker | `preview-stories` |
 | Verify a11y on stories you just changed | `run-story-tests` scoped to those stories |
 | Edit a component or story file | Direct file editing (`Read`/`Edit`/`Write`); MCP is for discovery and validation, not writing |
 

@@ -1,13 +1,13 @@
 # Design Preferences
 
 > Template shipped by the `ui-design` skill. On first use in a project, this is copied to
-> `.claude/mastermind/design-preferences.md` in that repo and accumulated there, never edited inside the plugin.
-> It serves as institutional memory for this project's UI/UX preferences: Claude reads it before refining and
+> `.mastermind/design-preferences.md` in that repository and accumulated there, never edited inside the plugin.
+> It serves as institutional memory for this project's UI/UX preferences: the active coding agent reads it before refining and
 > appends to it after each refinement loop.
 
 ## Last Updated
 
-<!-- Claude updates this timestamp -->
+<!-- The active coding agent updates this timestamp -->
 
 ## Brand Identity
 
@@ -94,15 +94,15 @@
 
 ### Patterns to Embrace
 
-<!-- Choices that have consistently driven score improvements. Claude appends here. -->
+<!-- Choices that have consistently driven score improvements. The active coding agent appends here. -->
 
 ### Patterns to Avoid
 
-<!-- Anti-patterns the evaluator has flagged. Claude appends here. -->
+<!-- Anti-patterns the evaluator has flagged. The active coding agent appends here. -->
 
 ### Decisions Log
 
-<!-- Claude appends one row per refinement loop. -->
+<!-- The active coding agent appends one row per refinement loop. -->
 
 | Date | Component/Page | Chosen Variant | Reasoning | Rejected Variants |
 | ---- | -------------- | -------------- | --------- | ----------------- |

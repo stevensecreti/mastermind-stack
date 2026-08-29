@@ -1,11 +1,15 @@
 ---
 name: mastermind
-description: Router and table of contents for the mastermind-stack plugin. Maps developer intent to the right skill, agent, or house-style rule. Consult when unsure which mastermind capability fits a request, when the user asks "what can mastermind do", or when routing a vague ask ("clean this up", "review my PR", "build a UI", "set this up") to a concrete entry point.
+description: >
+  Router and table of contents for the mastermind-stack plugin. Maps developer
+  intent to the right skill or house-style rule. Consult when unsure which
+  Mastermind capability fits a request, when the user asks what Mastermind can do,
+  or when routing a vague ask to a concrete entry point.
 ---
 
 # Mastermind Router
 
-`mastermind-stack` is a portable Claude Code stack: skills + agents + house-style rules, de-coupled from any one project. This skill is the map. The harness already lists every skill's description each session; this adds the curated **intent → entry point** mapping on top so a vague request lands on the right tool.
+`mastermind-stack` is a portable coding-agent stack: skills, specialized review workers, and house-style rules, de-coupled from any one project. This skill is the curated **intent → entry point** map.
 
 When a request is ambiguous, match it to a row below and invoke that entry point directly. When nothing fits, fall back to normal behavior. Don't force a match.
 
@@ -18,15 +22,15 @@ If `mastermind.config.json` doesn't exist in the project yet, or the house-style
 | You want to… | Entry point | Kind |
 |---|---|---|
 | Turn a UI screenshot/mockup into a framework-agnostic component hierarchy + composition plan | `ui-breakdown` | skill |
-| Explore the design space when you're unsure of direction: generate several directionally different coded variations and pick one (Agent Teams) | `ui-explore` | skill |
-| Refine an existing UI to excellence: an autonomous GAN generator/evaluator loop (Agent Teams + Playwright) on a component, page, section, or chosen variation | `ui-refine` | skill |
+| Explore the design space when you're unsure of direction: generate several directionally different coded variations and pick one | `ui-explore` | skill |
+| Refine an existing UI through an autonomous generator/evaluator loop with live browser validation | `ui-refine` | skill |
 
 ## Code quality & refactoring
 
 | You want to… | Entry point | Kind |
 |---|---|---|
 | Make AI/agent-written code read like a careful human wrote it in this codebase: strip AI tells, conform to local idiom; no structural changes | `naturalize` | skill |
-| Improve code without changing behavior: subtract excess (complexity, duplication, premature abstraction) and/or restructure for quality (SOLID, design patterns), on a diff or a codebase area | `refactor` | agent |
+| Improve code without changing behavior: subtract excess or restructure for quality, on a diff or a codebase area | `refactor` | skill |
 
 ## Code review
 
@@ -58,9 +62,9 @@ Both auto-detect the surface (GitHub PR via `gh` if a ref is given and authentic
 
 | You want to… | Entry point | Kind |
 |---|---|---|
-| Responses in meaning-first prose: short SVO sentences, plain words, chained ideas, assertions over hedges | `Throughline` | output style |
+| Responses in meaning-first prose: short SVO sentences, plain words, chained ideas, assertions over hedges | `throughline` | skill/style |
 
-Output styles aren't invoked like skills. The user activates one via `/config` → **Output style** (or `"outputStyle": "Throughline"` in settings); it then governs every response. If the user asks for terser, meaning-first responses, point them there.
+Invoke `throughline` for the current task or install it as standing guidance through `mastermind-setup`. Claude Code users can also activate the bundled `Throughline` output style through `/config`.
 
 ## House-style rules (always-on once installed)
 
@@ -69,4 +73,4 @@ These are always-on guidance, loaded into every session once `mastermind-setup` 
 - **`critical-rules`**: the non-negotiables every session follows (proceed on execution / gate on architecture, reuse-first, the definition of done, fix-what-you-find).
 - **`architecture-principles`**: contract-first, modularity, converge-on-final-state, idempotency, reuse-first, exhaust-the-design-space, build-the-lever, fix-adjacent-problems.
 - **`definition-of-done`**: testing, validation (`checkCommand`/`testCommand`), docs, stories, architectural quality, the bar every change must clear.
-- **`agent-teams-guidance`**: when to use a single session vs subagents vs agent teams, lead/worker roles, task decomposition, model routing.
+- **`agent-teams-guidance`**: when to use a single session, isolated subagents, or persistent collaborators; lead/worker roles and task decomposition.

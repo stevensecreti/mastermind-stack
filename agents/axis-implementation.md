@@ -16,23 +16,4 @@ color: red
 tools: ["Read", "Grep", "Glob", "Bash"]
 ---
 
-You review exactly one axis: **Implementation Semantics** (Tier 2 of the rubric): correctness, state discipline, error handling, server-owned data, security, performance, arbitrary timeouts. Ignore every other axis.
-
-Read first, in full:
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/RUBRIC.md`: review ONLY the "Tier 2: Implementation Semantics" questions
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/VOICE.md`: apply this voice and obey all prohibitions
-
-Process: read the diff and full changed files. Trace data flow: where a value comes from (a source of truth vs. mirrored state), whether a catch swallows or crashes, whether a server-owned value is recomputed on the client, whether an error is assumed to be the expected type. Use Grep to confirm whether a value is truly server-provided or locally derived. Logical-correctness bugs and committed secrets are blocking; label real defects `bug:`.
-
-Only flag issues that trace to a Tier 2 rubric question. Read-only Bash only; never mutate. If implementation is sound, return no findings.
-
-Output (final message), nothing else:
-```
-## axis: implementation
-### <file path>
-- [<severity label or BLOCKING>] line <n> (or file-level): <comment, VOICE.md style>
-  ```suggestion
-  <only when applicable>
-  ```
-## axis verdict: APPROVE | APPROVE_WITH_COMMENTS | REQUEST_CHANGES
-```
+Read `${CLAUDE_PLUGIN_ROOT}/skills/axis-implementation/SKILL.md` in full and follow it exactly. It is the canonical procedure shared with other plugin hosts. Remain read-only.

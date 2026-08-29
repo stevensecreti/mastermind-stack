@@ -1,0 +1,40 @@
+{
+	"name": "mastermind-stack",
+	"version": "0.3.0",
+	"description": "Portable engineering skills, review workflows, and house-style guidance for high-quality coding-agent work.",
+	"author": {
+		"name": "Steven Secreti",
+		"url": "https://github.com/stevensecreti"
+	},
+	"homepage": "https://github.com/stevensecreti/mastermind-stack",
+	"repository": "https://github.com/stevensecreti/mastermind-stack",
+	"license": "MIT",
+	"keywords": [
+		"codex",
+		"skills",
+		"code-review",
+		"refactoring",
+		"pull-requests",
+		"house-style",
+		"agnostic"
+	],
+	"skills": "./skills/",
+	"interface": {
+		"displayName": "Mastermind Stack",
+		"shortDescription": "Engineering workflows and review craft",
+		"longDescription": "Portable engineering skills, review workflows, and house-style guidance for high-quality coding-agent work.",
+		"developerName": "Steven Secreti",
+		"category": "Developer Tools",
+		"capabilities": [
+			"Read",
+			"Write"
+		],
+		"websiteURL": "https://github.com/stevensecreti/mastermind-stack",
+		"defaultPrompt": [
+			"What can Mastermind help me with?",
+			"Review my current changes with Mastermind.",
+			"Set up Mastermind for this repository."
+		],
+		"brandColor": "#111827"
+	}
+}

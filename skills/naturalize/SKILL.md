@@ -1,6 +1,11 @@
 ---
 name: naturalize
-description: Make AI/agent-written code read like a careful human contributor wrote it in THIS codebase. A diff-scoped, behavior-preserving pass that strips AI "tells" (narration comments, ceremonial defensive guards, `any` escape hatches, generic boilerplate/naming, needless nesting) and conforms new code to the surrounding code's idiom, density, and conventions. Use after an agent or AI assistant writes/edits code (before committing or opening a PR) when the code works but reads machine-generated. NOT for structural or architectural changes (use `refactor` for those).
+description: >
+  Make AI/agent-written code read like a careful human contributor wrote it in this
+  codebase. A diff-scoped, behavior-preserving pass that strips AI tells and
+  conforms new code to surrounding idiom, density, and conventions. Use after
+  generated code works but reads machine-written. For structural changes, use the
+  refactor skill.
 ---
 
 # Naturalize
@@ -14,7 +19,7 @@ Two non-negotiables:
 
 ## Boundary with `refactor`
 
-| | `naturalize` (this skill) | `refactor` (agent) |
+| | `naturalize` (this skill) | `refactor` (skill) |
 |---|---|---|
 | Question | "Does this **read** like this codebase / like a human wrote it?" | "Is this **well-built**?" |
 | Touches | comments, naming, idioms, density, local style, ceremonial code | structure: complexity, duplication, abstractions, SOLID, patterns |

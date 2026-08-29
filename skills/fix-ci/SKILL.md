@@ -1,8 +1,6 @@
 ---
 name: fix-ci
 description: Diagnose and fix failing CI checks on the current PR. Fetches GitHub Actions results, identifies failures, implements fixes, pushes, and loops until all checks pass.
-disable-model-invocation: true
-argument-hint: "[max-attempts (default 5)]"
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, MultiTool
 ---
 
@@ -12,12 +10,19 @@ You are fixing CI failures on the current PR. Your goal: **all checks green.** W
 
 ## Current PR context
 
-- PR info: !`gh pr view --json number,title,headRefName,url 2>/dev/null || echo "ERROR: No PR found for current branch. Abort and tell user."`
-- Current check status: !`gh pr checks 2>/dev/null || echo "ERROR: Could not fetch checks."`
+Start by running:
+
+```sh
+gh pr view --json number,title,headRefName,url
+gh pr checks
+```
+
+If no PR exists for the current branch or checks cannot be fetched, stop and report
+the concrete error.
 
 ## Process
 
-Set MAX_ATTEMPTS from $ARGUMENTS (default 5). Then loop:
+Use a user-provided maximum-attempt count when present; otherwise default to 5. Then loop:
 
 ### 1. Identify failures
 
