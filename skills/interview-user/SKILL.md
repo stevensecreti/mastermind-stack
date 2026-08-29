@@ -10,9 +10,9 @@ Systematic gap-filling before proceeding. Do NOT begin work with unresolved ambi
 ## Process
 
 1. **Identify gaps**: analyze request → list what's known → list what's unknown
-2. **Batch questions**: use `AskUserQuestion`: 1-4 questions per call, prefer fewer broader questions to minimize rounds. Each question gets 2-4 options with one marked recommended (based on project context and best practices, not a fixed position). Include brief trade-off rationale in descriptions.
+2. **Batch questions**: use the host's structured user-input mechanism when available: 1-4 questions per call, preferring fewer broader questions. Give each question 2-4 options with one context-dependent recommendation and brief trade-off rationale. If structured input is unavailable, ask the same concise questions directly.
 3. **Process answers**: if any answer is ambiguous or contradicts a prior answer, follow up immediately
-4. **Repeat until all gaps are filled**: no contradictions remain, sufficient info to proceed confidently. Claude decides when complete, no user signal needed.
+4. **Repeat until all gaps are filled**: no contradictions remain and there is enough information to proceed confidently. The active agent decides when the interview is complete; no explicit user signal is required.
 5. **Summarize and proceed**: briefly restate key decisions made, then begin work.
 
 ## Rules

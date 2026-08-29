@@ -5,17 +5,16 @@ description: >
   changes", "do a DNA review", "review this branch", or wants a fast code review
   in Steven's style. It orchestrates a structured single-pass review against a
   rubric of principles (references/RUBRIC.md) written in a specific voice
-  (references/VOICE.md), dispatching analysis to the dna-reviewer agent. For a
+  (references/VOICE.md), dispatching analysis through the dna-reviewer skill. For a
   thorough multi-axis review, use deep-review instead.
-version: 0.1.0
 ---
 
 # Code Review DNA
 
 Perform a code review that applies a fixed rubric of principles in a fixed voice. Two reference documents define the review completely; read both before reviewing and do not deviate from them:
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/RUBRIC.md`: WHAT to look for (four tiers, ordered by cost-to-change-later, plus verdict rules)
-- `${CLAUDE_PLUGIN_ROOT}/skills/code-review-dna/references/VOICE.md`: HOW to say it (question/directive calibration, severity labels, mechanics, hard prohibitions)
+- `references/RUBRIC.md`: WHAT to look for (four tiers, ordered by cost-to-change-later, plus verdict rules)
+- `references/VOICE.md`: HOW to say it (question/directive calibration, severity labels, mechanics, hard prohibitions)
 
 The rubric and voice are language- and framework-agnostic; apply them through the conventions of whatever stack the project uses.
 
@@ -33,13 +32,13 @@ gh pr diff <ref>
 ```
 Local mode: `git diff <merge-base>...HEAD` plus `git status` for untracked files.
 
-In both modes, also collect: the linked issue/ticket text if referenced, the repo's `CLAUDE.md`/contributing conventions if present, and the full contents of any changed file whose diff hunks are insufficient to judge architecture (Tier 1 questions usually require whole-file reads, not hunks).
+In both modes, also collect: the linked issue/ticket text if referenced, the repo's governing instructions (`AGENTS.md`, `CLAUDE.md`, or equivalent) and contributing conventions, plus the full contents of changed files whose diff hunks are insufficient to judge architecture.
 
-## Step 3: Dispatch to the reviewer agent
+## Step 3: Dispatch the reviewer
 
-Launch the `dna-reviewer` agent with: the diff, the PR/ticket context, paths of changed files (the agent reads full files itself), and explicit pointers to RUBRIC.md and VOICE.md. For very large changes (>40 changed files), fan out one agent per cohesive area (by layer or by feature directory) and merge their findings, deduplicating cross-file repeats into cross-references ("Same comment as above but for `X`").
+Read `../dna-reviewer/SKILL.md`, then use the host's isolated-subagent mechanism when available. Give the reviewer the diff, PR/ticket context, changed-file paths, and explicit pointers to the rubric and voice. If isolated subagents are unavailable, perform the same procedure in the current session. For very large changes (>40 changed files), fan out one reviewer per cohesive area when parallel work is available, then merge and deduplicate repeated findings.
 
-The agent returns structured findings:
+The reviewer returns structured findings:
 
 ```
 - file, line (or file-level), severity label, comment body, optional suggestion block

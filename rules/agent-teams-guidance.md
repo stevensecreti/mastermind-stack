@@ -1,58 +1,62 @@
-# Agent Teams & Parallel Work
+# Parallel Work & Subagents
 
-## When to Use What
+## Choose the smallest useful topology
 
-- **Single session**: sequential work, <10 tool calls, tight file coupling
-- **Subagents**: self-contained tasks where only the result matters, no inter-worker communication needed, isolating verbose output
-- **Agent Teams**: 3+ independent parallel streams, cross-cutting concerns, workers need to coordinate. Default choice for multi-subtask implementation work.
+- **Single session:** sequential work, fewer than roughly ten tool calls, or tightly coupled files.
+- **Isolated subagent:** a self-contained task where only the result matters and verbose context should stay out of the main thread.
+- **Persistent collaborators:** three or more independent streams, cross-cutting concerns, or work that needs coordination across rounds.
 
-## Lead Role
+Use the host's native collaboration mechanism. If it is unavailable, preserve the same decomposition and run the work sequentially.
 
-The lead orchestrates. It does NOT implement. Use delegate mode (Shift+Tab).
+## Lead role
 
-- Decompose objective into self-contained, file-disjoint subtasks before spawning workers
-- Assign each worker explicit file ownership boundaries in the spawn prompt
-- Workers do NOT need the full plan. Give them just: what to build, where it goes, and any interface contracts. The lead retains all architectural context, rationale, and cross-cutting details. Over-briefing workers wastes tokens and invites off-script decisions.
-- Monitor progress, synthesize outputs, resolve interface mismatches
-- All implementation decisions stay with the lead. Workers escalate, lead decides
-- Wait for all workers to finish before integration. Never code alongside workers.
+The lead owns decomposition, interfaces, integration, and decisions. When delegation is active, the lead should:
 
-## Task Decomposition
+- split the objective into self-contained, file-disjoint tasks before dispatch;
+- give every worker explicit file ownership and interface boundaries;
+- retain architectural rationale and cross-cutting context rather than over-briefing workers;
+- monitor progress and resolve interface mismatches;
+- keep substantive decisions with the lead; and
+- wait for all required outputs before integration.
 
-Each subtask must be:
-- **Self-contained**: produces a clear deliverable (function, component, test file)
-- **File-disjoint**: no two tasks touch the same file. Two workers editing one file = overwrites. If tasks share an interface, define the contract up front and assign one side per worker.
-- **Context-minimal**: workers get ONLY what they need to execute: task spec, file paths, interface contracts. NOT the full plan, NOT the rationale, NOT the conversation history. Excess context invites workers to freelance.
-- **Right-sized**: aim for 5-6 tasks per worker
+Do not have two workers edit the same file. The lead may continue with genuinely independent local work when the host safely supports concurrent edits and ownership boundaries remain disjoint.
 
-Declare ownership explicitly in spawn prompts:
+## Task decomposition
+
+Each delegated task must be:
+
+- **Self-contained:** it produces a clear deliverable.
+- **File-disjoint:** one owner per writable file.
+- **Context-minimal:** the worker receives its task, paths, constraints, and interface contracts.
+- **Right-sized:** large enough to justify delegation, small enough to verify independently.
+
+Declare ownership explicitly:
+
+```text
+You own only src/components/UserCard.tsx and src/components/UserCard.test.tsx. Do not modify files outside this set.
 ```
-"You own ONLY: src/components/UserCard.tsx, src/components/UserCard.test.tsx. Do not modify files outside this set."
-```
 
-## Model Routing
+## Capability routing
 
-| Complexity | Model | Examples |
-|---|---|---|
-| Trivial/mechanical | Haiku | File moves, renames, boilerplate, import updates |
-| Standard implementation | Sonnet | New functions, components, tests, well-defined features |
-| Complex/architectural | Opus | Cross-module refactors, security-sensitive, significant judgment required |
+- Mechanical work: use a fast, cost-efficient worker when the host offers model choice.
+- Standard implementation: use the host's balanced default.
+- Architectural or security-sensitive work: use the strongest available reasoning tier and keep approval gates around substantive decisions.
 
-Default to Sonnet. Require plan approval before implementation for Opus-tier tasks.
+Do not hardcode provider-specific model names into durable project rules.
 
-## Worker Rules
+## Worker rules
 
-1. Do exactly what the task says, nothing more, nothing less. You don't have the full picture and that's by design. Don't interpret, infer, or freelance beyond the explicit task spec.
-2. Stay within file ownership boundaries
-3. Escalate ambiguities/decisions to the lead. Never decide unilaterally
-4. Peer-message only for direct interface dependencies with a specific other worker. All else goes through lead.
-5. Finish and stop. Don't look for extra work or refactor adjacent code.
+1. Do exactly the assigned task.
+2. Stay within ownership boundaries.
+3. Escalate ambiguous decisions to the lead.
+4. Communicate directly with peers only for explicit interface dependencies.
+5. Finish the deliverable and stop.
 
-## Anti-Patterns
+## Anti-patterns
 
-- Teaming tasks a single session handles in 5 minutes
-- More than 5 workers (coordination cost > parallelism gain)
-- Vague tasks ("handle the frontend") vs actionable specs with file paths + contracts
-- Workers making architectural decisions
-- Lead implementing alongside workers
-- Two workers editing the same file
+- Delegating work a single session can finish in minutes.
+- More workers than the available independent work supports.
+- Vague tasks without paths, outputs, or contracts.
+- Workers making unowned architectural decisions.
+- Overlapping file ownership.
+- Treating parallelism as a requirement rather than a latency optimization.

@@ -1,19 +1,22 @@
 ---
 name: review-comments
-description: Fetch and analyze PR review comments, implement agreed fixes, reply to disagreements, and post "addressed in <sha>" replies on fixed threads so the PR always reflects current state
-disable-model-invocation: true
-argument-hint: [optional extra instructions]
+description: Fetch and analyze PR review comments, implement agreed fixes, reply to disagreements, and post commit-SHA replies on fixed threads so the PR always reflects current state.
 allowed-tools: Bash(gh *), Bash(git *)
 ---
 
-## PR context
+## Gather PR context
 
-- **Metadata:** !`gh pr view --json number,title,url,headRefName --jq '{number, title, url, branch: .headRefName}'`
-- **Changed files:** !`gh pr diff --name-only`
-- **Review comments (inline):** !`PR=$(gh pr view --json number -q .number) && gh api "repos/{owner}/{repo}/pulls/$PR/comments" --jq '[.[] | {path: .path, line: .original_line, body: .body, author: .user.login, id: .id, in_reply_to_id: .in_reply_to_id}]'`
-- **Reviews (top-level):** !`PR=$(gh pr view --json number -q .number) && gh api "repos/{owner}/{repo}/pulls/$PR/reviews" --jq '[.[] | select(.body != "") | {state: .state, body: .body, author: .user.login}]'`
-- **Conversation comments:** !`gh pr view --json comments --jq '[.comments[] | {author: .author.login, body: .body}]'`
-- **Review threads (with thread IDs for resolving):** !`OWNER=$(gh repo view --json owner -q .owner.login) && REPO=$(gh repo view --json name -q .name) && PR=$(gh pr view --json number -q .number) && gh api graphql -f query="query { repository(owner:\"$OWNER\", name:\"$REPO\") { pullRequest(number:$PR) { reviewThreads(first:100) { nodes { id isResolved comments(first:20) { nodes { databaseId author { login } path body } } } } } } }" --jq '.data.repository.pullRequest.reviewThreads.nodes'`
+Use `gh` to collect the current PR's metadata, changed files, inline review comments,
+top-level reviews, conversation comments, and review threads before evaluating any
+feedback. A suitable command set is:
+
+```sh
+gh pr view --json number,title,url,headRefName,comments
+gh pr diff --name-only
+gh api "repos/{owner}/{repo}/pulls/<pr-number>/comments"
+gh api "repos/{owner}/{repo}/pulls/<pr-number>/reviews"
+gh api graphql -f query='query { repository(owner:"<owner>", name:"<repo>") { pullRequest(number:<pr-number>) { reviewThreads(first:100) { nodes { id isResolved comments(first:20) { nodes { databaseId author { login } path body } } } } } } }'
+```
 
 ## Task
 
@@ -46,4 +49,4 @@ git rev-parse --short HEAD
 - Default behavior is full action (fix + push + "Addressed in <sha>" reply on fixed threads, pushback reply on disagreements). The user does not need to ask.
 - Do **not** resolve threads; leave that to the reviewer. The "Addressed in <sha>" reply is the signal that the fix has landed.
 - Never silently skip a comment; every comment ends up with either an "Addressed in <sha>" reply or a pushback/explanation reply.
-- If `$ARGUMENTS` contains overrides (e.g. "report only", "don't push", "resolve threads"), honor them.
+- Honor any user-provided overrides such as "report only" or "don't push."

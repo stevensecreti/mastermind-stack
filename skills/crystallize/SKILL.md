@@ -2,7 +2,6 @@
 name: crystallize
 description: >
   Turn the task you just did into a reusable, project-agnostic skill. Takes a concrete piece of work completed in this session, extracts its abstract recipe (intent, procedure, decision rules, done-condition), strips the incidental specifics (repo paths, file names, values, the particular framework/library/tool), and drafts a clean SKILL.md. Use when you've just done something by hand that you'll plausibly do again and want to "build the lever". Triggers: "make this a skill", "crystallize this", "turn what we just did into a skill", "encode this workflow".
-argument-hint: "[optional: what to crystallize and/or the new skill name]"
 ---
 
 # Crystallize
@@ -53,7 +52,7 @@ Replace incidentals with inputs, placeholders, or "detect from the project." **E
 - **Frontmatter:** `name` (kebab-case; verify it collides with neither a built-in command nor an existing skill), `description` (what it does **and** the when-to-use triggers, since that drives invocation).
 - **Body:** the recipe from Steps 2-3, written as instructions to a *future agent who wasn't here*: concrete, ordered, decision rules and guardrails inline.
 - **Match the house format:** self-describing, in the voice of the surrounding skills.
-- **Place it** in the right skill directory: the plugin's `skills/<name>/` if it's a portable stack skill, or the consuming repo's `.claude/skills/<name>/` if it's project-local. Ask if unclear.
+- **Place it** in the right skill directory: the plugin's `skills/<name>/` if it is portable, or the consuming repo's host-native project skill directory (for example `.agents/skills/<name>/` or `.claude/skills/<name>/`) if it is project-local. Ask if unclear.
 
 ## Step 6: Verify
 

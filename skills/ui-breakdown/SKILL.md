@@ -1,8 +1,6 @@
 ---
 name: ui-breakdown
 description: Decompose attached UI design images into a 5-tier component hierarchy (primitives, components, feature components, sections, views) and produce a comprehensive, framework-agnostic composition plan as a design document. Detects and follows whatever UI stack the project actually uses. Read-only analysis; never writes source code.
-disable-model-invocation: true
-argument-hint: [optional-output-path]
 ---
 
 # UI Breakdown
@@ -25,7 +23,7 @@ Advance only when the current step's gate is met. Do not collapse steps.
 
 1. **Verify images.** Confirm images are attached and image-to-view mapping is unambiguous. If either fails, stop and ask the user to clarify or label.
 2. **Detect project context** (see below). Gate: you have identified the project's UI framework, component library/design system, and conventions, and inventoried the existing UI directory structure.
-3. **Resolve output path** (see below). Gate: path is confirmed with the user, or `$ARGUMENTS` was explicit.
+3. **Resolve output path** (see below). Gate: the path is confirmed with the user or was explicitly provided in the request.
 4. **Per-image element enumeration.** For each image, walk every visible element top-to-bottom, left-to-right. Group repeats within and across images. Note state variants visible (empty, loading, error, populated, hover, focused, disabled, selected). Gate: every element on screen is named.
 5. **Existing-design-system audit.** For every enumerated element, check the detected design system / component library for an existing match. Record matches by path. Gate: each element has either an existing-match path or an explicit "no existing match" note.
 6. **Tier assignment.** Place every element into exactly one of the 5 tiers. For anything tiered as Feature Component or above, write the specific justification (domain coupling, business logic, contained state). Gate: zero elements untyped.
@@ -38,7 +36,7 @@ Advance only when the current step's gate is met. Do not collapse steps.
 
 Before analyzing images, make NO assumption about the stack; detect it:
 
-1. Read the root `CLAUDE.md` (and any `mastermind.config.json`) and any nested `CLAUDE.md` in UI directories.
+1. Read the root repository instructions (`AGENTS.md`, `CLAUDE.md`, or equivalent), `mastermind.config.json`, and any nested governing instructions in UI directories.
 2. Read the project's manifest (`package.json`, `pubspec.yaml`, `*.csproj`, etc.): identify the UI framework, component library / design system, and any form/state/data-fetching/icon libraries.
 3. Glob the existing design system: e.g. `**/components/**`, `**/design-system/**`, `**/ui/**`, `**/theme/**`, `**/tokens/**`. Read enough to know what already exists.
 4. Skim any design-system or component docs (Storybook, a docs site) if present.
@@ -47,10 +45,10 @@ Record the detected stack at the top of the design doc. If no framework can be d
 
 ## Output path resolution
 
-1. If `$ARGUMENTS` non-empty, use it.
+1. If the request provides an output path, use it.
 2. Else if a docs site exists (e.g. `docs/` with a site config), use `docs/<design-subdir>/<kebab-feature-name>.md` with that site's expected frontmatter.
-3. Else if `.claude/plans/` exists, use `.claude/plans/<kebab-feature-name>-design.md`.
-4. Else create `.claude/plans/` and use it.
+3. Else if `.mastermind/plans/` exists, use `.mastermind/plans/<kebab-feature-name>-design.md`.
+4. Else create `.mastermind/plans/` and use it.
 
 ## 5-tier component hierarchy
 
